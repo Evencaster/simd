@@ -63,7 +63,28 @@ func (m *TwoDimensional) N() int {
 	return len(m.matrix[0])
 }
 
-func (m *TwoDimensional) Multiplication(n int) {
+func (m *TwoDimensional) Copy() *TwoDimensional {
+	duplicate := make([][]float64, len(m.matrix))
+	for i := range m.matrix {
+		duplicate[i] = make([]float64, len(m.matrix[i]))
+		copy(duplicate[i], m.matrix[i])
+	}
+	return &TwoDimensional{
+		matrix: duplicate,
+	}
+}
+
+func Negative(m *TwoDimensional) *TwoDimensional {
+	res := m.Copy()
+	for i := range m.matrix {
+		for j := range m.matrix[i] {
+			res.matrix[i][j] *= -1
+		}
+	}
+	return res
+}
+
+func (m *TwoDimensional) MultiplicationInt(n int) {
 	for i := range m.matrix {
 		for j := range m.matrix[i] {
 			m.matrix[i][j] *= float64(n)
@@ -71,7 +92,64 @@ func (m *TwoDimensional) Multiplication(n int) {
 	}
 }
 
-func (m *TwoDimensional) Sum(matrix TwoDimensional) error {
+func MultiplicationInt(first *TwoDimensional, n int) *TwoDimensional {
+	m := first.Copy()
+	m.MultiplicationInt(n)
+	return m
+}
+
+func SumInt(first *TwoDimensional, n int) (*TwoDimensional, error) {
+	m := first.Copy()
+	err := m.SumInt(n)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func Multiplication(first, second *TwoDimensional) (*TwoDimensional, error) {
+	if first.N() != second.M() {
+		return nil, errors.New("diff size")
+	}
+	res := NewTwoDimensionalWithValue(first.M(), second.N(), 0)
+	for i := range res.matrix {
+		for j := range res.matrix[i] {
+			for k := range second.matrix {
+				res.matrix[i][j] += first.matrix[i][k] * second.matrix[k][j]
+			}
+		}
+	}
+	return res, nil
+}
+
+func MustMultiplication(first, second *TwoDimensional) *TwoDimensional {
+	if first.N() != second.M() {
+		panic("diff size")
+	}
+	res := NewTwoDimensionalWithValue(first.M(), second.N(), 0)
+	for i := range res.matrix {
+		for j := range res.matrix[i] {
+			for k := range second.matrix {
+				res.matrix[i][j] += first.matrix[i][k] * second.matrix[k][j]
+			}
+		}
+	}
+	return res
+}
+
+func MustSum(first, second *TwoDimensional) *TwoDimensional {
+	if first.M() != second.M() || first.N() != second.N() {
+		panic("diff size")
+	}
+	res := first.Copy()
+	err := res.Sum(second)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
+func (m *TwoDimensional) Sum(matrix *TwoDimensional) error {
 	if m.M() != matrix.M() || m.N() != matrix.N() {
 		return errors.New("diff size")
 	}
@@ -81,6 +159,11 @@ func (m *TwoDimensional) Sum(matrix TwoDimensional) error {
 		}
 	}
 	return nil
+}
+
+func (m *TwoDimensional) SumInt(n int) error {
+	matrix := NewTwoDimensionalWithValue(m.M(), m.N(), n)
+	return m.Sum(matrix)
 }
 
 func (m *TwoDimensional) String() string {

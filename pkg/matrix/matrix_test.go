@@ -48,7 +48,7 @@ func TestTwoDimensional_Multiplication(t *testing.T) {
 	m := &TwoDimensional{
 		matrix: src,
 	}
-	m.Multiplication(n)
+	m.MultiplicationInt(n)
 
 	exp := [][]float64{
 		{3.0, 0.30000000000000004, -0.30000000000000004},
@@ -62,7 +62,7 @@ func TestTwoDimensional_Sum(t *testing.T) {
 		matrix [][]float64
 	}
 	type args struct {
-		matrix TwoDimensional
+		matrix *TwoDimensional
 	}
 	tests := []struct {
 		name      string
@@ -79,7 +79,7 @@ func TestTwoDimensional_Sum(t *testing.T) {
 				},
 			},
 			args: args{
-				matrix: TwoDimensional{matrix: [][]float64{
+				matrix: &TwoDimensional{matrix: [][]float64{
 					{0.2, 0.3, -0.1},
 					{0.9, -0.6, -0.2},
 				}},
@@ -113,4 +113,98 @@ func assertMatrix(t *testing.T, want, got TwoDimensional) {
 		}
 	}
 
+}
+
+func TestMultiplication(t *testing.T) {
+	type args struct {
+		first  *TwoDimensional
+		second *TwoDimensional
+	}
+	tests := []struct {
+		name string
+		args args
+		want *TwoDimensional
+	}{
+		{
+			name: "",
+			args: args{
+				first: &TwoDimensional{matrix: [][]float64{
+					{-2, 1},
+					{5, 4},
+				}},
+				second: &TwoDimensional{matrix: [][]float64{
+					{3},
+					{-1},
+				}},
+			},
+			want: &TwoDimensional{matrix: [][]float64{
+				{-7},
+				{11},
+			}},
+		},
+		{
+			name: "",
+			args: args{
+				first: &TwoDimensional{matrix: [][]float64{
+					{2, -3},
+					{4, -6},
+				}},
+				second: &TwoDimensional{matrix: [][]float64{
+					{9, -6},
+					{6, -4},
+				}},
+			},
+			want: &TwoDimensional{matrix: [][]float64{
+				{0, 0},
+				{0, 0},
+			}},
+		},
+		{
+			name: "",
+			args: args{
+				first: &TwoDimensional{matrix: [][]float64{
+					{5, 8, -4},
+					{6, 9, -5},
+					{4, 7, -3},
+				}},
+				second: &TwoDimensional{matrix: [][]float64{
+					{2},
+					{-3},
+					{1},
+				}},
+			},
+			want: &TwoDimensional{matrix: [][]float64{
+				{-18},
+				{-20},
+				{-16},
+			}},
+		},
+		{
+			name: "",
+			args: args{
+				first: &TwoDimensional{matrix: [][]float64{
+					{5, 8, -4},
+					{6, 9, -5},
+					{4, 7, -3},
+				}},
+				second: &TwoDimensional{matrix: [][]float64{
+					{3, 2, 5},
+					{4, -1, 3},
+					{9, 6, 5},
+				}},
+			},
+			want: &TwoDimensional{matrix: [][]float64{
+				{11, -22, 29},
+				{9, -27, 32},
+				{13, -17, 26},
+			}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Multiplication(tt.args.first, tt.args.second)
+			require.NoError(t, err)
+			assertMatrix(t, *tt.want, *got)
+		})
+	}
 }
