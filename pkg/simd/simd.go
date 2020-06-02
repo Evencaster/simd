@@ -52,10 +52,6 @@ func (p Processor) dThreeDimensional() (*matrix.TwoDimensional, error) {
 	return matrix.Multiplication(p.A, p.B)
 }
 
-func (p Processor) matrixConversion(a, b *matrix.TwoDimensional) (int, error) {
-	return 1, nil
-}
-
 func (p Processor) evaluateKTimes(dimensional *matrix.TwoDimensional) (*matrix.TwoDimensional, error) {
 	var err error
 	dupl := dimensional.Copy()
@@ -91,7 +87,6 @@ func (p Processor) firstSumOfResult() (*matrix.TwoDimensional, error) {
 }
 
 func (p Processor) secondSumOfResult() (*matrix.TwoDimensional, error) {
-	// (vDijk+(4*(^Fjik*vDijk)-3*vDijk)-3*vDijk)(1-Gij)
 	vDijk, err := p.vDijk()
 	if err != nil {
 		return nil, err
@@ -117,10 +112,6 @@ func (p Processor) secondSumOfResult() (*matrix.TwoDimensional, error) {
 }
 
 func (p Processor) firstSumOfThreeDem() (*matrix.TwoDimensional, error) {
-	convRes, err := p.matrixConversion(p.A, p.B)
-	if err != nil {
-		return nil, err
-	}
 	multRes, err := matrix.SumInt(p.E, 2)
 	if err != nil {
 		return nil, err
@@ -129,10 +120,6 @@ func (p Processor) firstSumOfThreeDem() (*matrix.TwoDimensional, error) {
 	if err != nil {
 		return nil, err
 	}
-	//multRes, err = matrix.Multiplication(convRes, sumRes)
-	//if err != nil {
-	//	return nil, err
-	//}
 	multRes = matrix.MultiplicationInt(sumRes, convRes)
 	multRes, err = matrix.Multiplication(multRes, p.E)
 	if err != nil {
@@ -142,18 +129,6 @@ func (p Processor) firstSumOfThreeDem() (*matrix.TwoDimensional, error) {
 }
 
 func (p Processor) secondSumOfThreeDem() (*matrix.TwoDimensional, error) {
-	bToA, err := p.matrixConversion(p.B, p.A)
-	if err != nil {
-		return nil, err
-	}
-
-	aToB, err := p.matrixConversion(p.A, p.B)
-	if err != nil {
-		return nil, err
-	}
-
-	//multInt := matrix.MultiplicationInt(aToB, 4)
-	multInt := aToB * 4
 
 	mult := matrix.MultiplicationInt(p.E, multInt)
 
